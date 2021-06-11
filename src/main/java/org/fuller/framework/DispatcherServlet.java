@@ -1,5 +1,6 @@
 package org.fuller.framework;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.fuller.controller.IndexController;
 import org.fuller.controller.UserController;
@@ -12,12 +13,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @WebServlet(urlPatterns = "/")
 public class DispatcherServlet extends HttpServlet {
@@ -39,7 +39,59 @@ public class DispatcherServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         logger.info("info{}...", getClass().getSimpleName());
-        // TODO: 2021/6/9
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//        依次处理Controller：
+        for (Class<?> controllerClass : controllers) {
+            try {
+                Object controllerInstance = controllerClass.getConstructor().newInstance();
+//                依次处理Method：
+                for (Method method : controllerClass.getMethods()) {
+                    if (method.getAnnotation(GetMapping.class) != null) {
+//                        处理@Get
+                        if (method.getReturnType() != ModelAndView.class && method.getReturnType() != void.class) {
+                            throw new UnsupportedOperationException(
+                                    "Unsupported return type: " + method.getReturnType() + " for method: " + method
+                            );
+                        }
+                        for (Class<?> parameterClass : method.getParameterTypes()) {
+                            if (!supportedGetParameterTypes.contains(parameterClass)) {
+                                throw new UnsupportedOperationException(
+                                        "Unsupported parameter type: " + parameterClass + " for method: " + method
+                                );
+                            }
+                        }
+                        String[] parameterNames = Arrays.stream(method.getParameterTypes()).map(Class::getName).toArray(String[]::new);
+                        String path = method.getAnnotation(GetMapping.class).value();
+                        logger.info("Found GET:{} => {}", path, method);
+                        this.getMappings.put(path, new GetDispatcher(controllerInstance, method, parameterNames, method.getParameterTypes()));
+                    } else if (method.getAnnotation(PostMapping.class) != null) {
+//                        处理@Post：
+                        if (method.getReturnType() != ModelAndView.class && method.getReturnType() != void.class) {
+                            throw new UnsupportedOperationException(
+                                    "Unsupported return type: " + method.getReturnType() + " for method: " + method
+                            );
+                        }
+                        Class<?> requestBodyClass = null;
+                        for (Class<?> parameterClass : method.getParameterTypes()) {
+                            if (!supportedPostParameterTypes.contains(parameterClass)) {
+                                if (requestBodyClass == null) {
+                                    requestBodyClass = parameterClass;
+                                } else {
+                                    throw new UnsupportedOperationException("Unsupported duplicate request body type: " + parameterClass + " for method: " + method);
+                                }
+                            }
+                        }
+                        String path = method.getAnnotation(PostMapping.class).value();
+                        logger.info("Found POST:{} => {}", path, method);
+                        this.postMapping.put(path, new PostDispatcher(controllerInstance, method, method.getParameterTypes(), objectMapper));
+                    }
+                }
+            } catch (ReflectiveOperationException e) {
+                throw new ServletException(e);
+            }
+        }
+        this.viewEngine = new ViewEngine(getServletContext());
     }
 
     @Override
@@ -53,7 +105,30 @@ public class DispatcherServlet extends HttpServlet {
     }
 
     private void process(HttpServletRequest req, HttpServletResponse resp, Map<String, ? extends AbstractDispatcher> dispatcherMap) throws ServletException, IOException {
-        // TODO: 2021/6/9
+        resp.setContentType("text/html");
+        resp.setCharacterEncoding("UTF-8");
+        String path = req.getRequestURI().substring(req.getContextPath().length());
+        AbstractDispatcher dispatcher = dispatcherMap.get(path);
+        if (dispatcher == null) {
+            resp.sendError(404);
+            return;
+        }
+        ModelAndView mv;
+        try {
+            mv = dispatcher.invoke(req, resp);
+        } catch (ReflectiveOperationException e) {
+            throw new ServletException(e);
+        }
+        if (mv == null) {
+            return;
+        }
+        if (mv.view.startsWith("redirect:")) {
+            resp.sendRedirect(mv.view.substring(9));
+            return;
+        }
+        PrintWriter pw = resp.getWriter();
+        this.viewEngine.render(mv, pw);
+        pw.flush();
     }
 
     private static final Set<Class<?>> supportedGetParameterTypes = Set.of(int.class, long.class, boolean.class, String.class, HttpServletRequest.class,
@@ -128,7 +203,20 @@ class PostDispatcher extends AbstractDispatcher {
 
     @Override
     public ModelAndView invoke(HttpServletRequest request, HttpServletResponse response) throws IOException, ReflectiveOperationException {
-        // TODO: 2021/6/9
-        return null;
+        Object[] arguments = new Object[parameterClasses.length];
+        for (int i = 0; i < parameterClasses.length; i++) {
+            Class<?> parameterClass = parameterClasses[i];
+            if (parameterClass == HttpServletRequest.class) {
+                arguments[i] = request;
+            } else if (parameterClass == HttpServletResponse.class) {
+                arguments[i] = response;
+            } else if (parameterClass == HttpSession.class) {
+                arguments[i] = request.getSession();
+            } else {
+                BufferedReader reader = request.getReader();
+                arguments[i] = this.objectMapper.readValue(reader, parameterClass);
+            }
+        }
+        return (ModelAndView) this.method.invoke(instance, arguments);
     }
 }
