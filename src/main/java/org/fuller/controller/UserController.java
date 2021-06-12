@@ -21,6 +21,6 @@ public class UserController {
 
     @GetMapping("/hello")
     public ModelAndView hello() {
-        return new ModelAndView("/index.html");
+        return new ModelAndView("");
     }
 }

@@ -9,6 +9,6 @@ public class IndexController {
 
     @GetMapping("/index")
     public ModelAndView index(HttpSession session) {
-        return new ModelAndView("/index.html");
+        return new ModelAndView("");
     }
 }
