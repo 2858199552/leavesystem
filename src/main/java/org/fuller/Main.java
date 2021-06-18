@@ -21,9 +21,9 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
         HikariStart();
-        tomcatStart();
-
         DatabaseInitializer.init();
+
+        tomcatStart();
     }
 
     private static void tomcatStart() throws Exception {

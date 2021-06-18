@@ -55,4 +55,19 @@ public class UserController {
         // TODO: 2021/6/15
         return new ModelAndView("error.html");
     }
+
+    @GetMapping("/main")
+    public ModelAndView mainPage() {
+        return new ModelAndView("main.html");
+    }
+
+    @GetMapping("/top")
+    public ModelAndView topPage() {
+        return new ModelAndView("top.html");
+    }
+
+    @GetMapping("/left")
+    public ModelAndView leftPage() {
+        return new ModelAndView("left.html");
+    }
 }
