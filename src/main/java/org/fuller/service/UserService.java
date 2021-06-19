@@ -5,6 +5,7 @@ import org.fuller.bean.User;
 
 import java.sql.*;
 
+@Deprecated
 public class UserService {
 
     public User getUserByEmail(String email) throws SQLException {
