@@ -2,15 +2,21 @@ package org.fuller.controller;
 
 import org.fuller.bean.SignInBean;
 import org.fuller.bean.User;
+import org.fuller.entity.Teacher;
 import org.fuller.framework.GetMapping;
 import org.fuller.framework.ModelAndView;
 import org.fuller.framework.PostMapping;
+import org.fuller.service.TeacherService;
 import org.fuller.service.UserService;
+import org.fuller.session.LeaveSession;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class UserController {
@@ -19,6 +25,7 @@ public class UserController {
     public static final String KEY_USER_ADMIN = "admin";
 
     private UserService userService = new UserService();
+    private TeacherService teacherService = new TeacherService();
 
     @GetMapping("/")
     public ModelAndView index(HttpSession session) {
@@ -31,21 +38,48 @@ public class UserController {
     }
 
     @GetMapping("/login")
-    public ModelAndView login() {
+    public ModelAndView login(HttpSession session) {
+        System.out.println("----------------------");
         return new ModelAndView("login.html");
     }
 
     @PostMapping("/login")
-    public ModelAndView doLogin(SignInBean bean, HttpServletResponse response, HttpSession session) throws Exception {
+    public ModelAndView doLogin(SignInBean bean, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+//        String num = request.getParameter("num");
+//        String password = request.getParameter("password");
+//        String num = bean.num;
+//        String password = bean.password;
+        String num = "admin";
+        String password = "11111";
+        if (num.trim().length() == 5) {
+            teacherLogin(num, password, response);
+        } else {
+            studentLogin(num, password, response);
+        }
         // TODO: 2021/6/26 按照老师要求：需要检测是否是超级管理员 video:2/2/48:00
         try {
-            User user = userService.getUserByEmail(bean.email);
-            session.setAttribute(KEY_USER, user);
+//            User user = userService.getUserByEmail(bean.email);
+//            session.setAttribute(KEY_USER, user);
+            LeaveSession leaveSession = new LeaveSession();
+            session.setAttribute("leaveSession", leaveSession);
         } catch (Exception e) {
             return new ModelAndView("login.html");
         }
-        return new ModelAndView("redirect:/index");
+        return null;
     }
+
+    // region login
+    private void teacherLogin(String num, String password, HttpServletResponse response) throws SQLException {
+        Teacher teacher = teacherService.getByNum(num);
+        if (teacher != null) {
+            System.out.println("login success");
+        }
+    }
+
+    private void studentLogin(String num, String password, HttpServletResponse response) {
+
+    }
+    // endregion
 
     @GetMapping("/register")
     public ModelAndView register() {
@@ -71,8 +105,9 @@ public class UserController {
     }
 
     @GetMapping("/left")
-    public ModelAndView leftPage() {
-        return new ModelAndView("left.html");
+    public ModelAndView leftPage(HttpSession session) {
+        LeaveSession leaveSession = (LeaveSession) session.getAttribute("leaveSession");
+        return new ModelAndView("left.html", "leaveSession", leaveSession);
     }
 
     @GetMapping("/right")

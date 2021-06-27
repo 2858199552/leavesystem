@@ -8,17 +8,17 @@ import java.sql.*;
 @Deprecated
 public class UserService {
 
-    public User getUserByEmail(String email) throws SQLException {
+    public User getUserByNumber(String number) throws SQLException {
         try (Connection conn = Main.ds.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("SELECT id, password, createdAt FROM users WHERE email = ?")) {
-                ps.setObject(1, email);
+            try (PreparedStatement ps = conn.prepareStatement("SELECT id, name, num, password FROM students WHERE num = ?")) {
+                ps.setObject(1, number);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
                         String name = rs.getString("name");
                         long id = rs.getLong("id");
                         String password = rs.getString("password");
                         long createdAt = rs.getLong("createdAt");
-                        User user = new User(email, password, createdAt);
+                        User user = new User(number, password, createdAt);
                         return user;
                     } else {
                         throw new RuntimeException("get user by email failed.");
@@ -30,7 +30,7 @@ public class UserService {
 
     public User login(String email, String password) {
         try {
-            User user = getUserByEmail(email);
+            User user = getUserByNumber(email);
             if (user.getPassword().equals(password)) {
                 return user;
             } else {
@@ -44,10 +44,11 @@ public class UserService {
     public User register(String email, String password) throws SQLException {
         User user = new User(email, password, System.currentTimeMillis());
         try (Connection conn = Main.ds.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("INSERT INTO users (email, password, createdAt) VALUES (?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
+            try (PreparedStatement ps = conn.prepareStatement("INSERT INTO students (name, num, password, gradeId, gender) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
                 ps.setObject(1, user.getEmail());
                 ps.setObject(2, user.getPassword());
                 ps.setObject(3, user.getCreatedAt());
+                // TODO: 2021/6/27 user逻辑完全混乱，需要重写
                 int n = ps.executeUpdate();
                 if (n != 1) {
                     throw new RuntimeException("register failed.");

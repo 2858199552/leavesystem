@@ -9,4 +9,5 @@ public class Teacher {
     private String num;
     private String password;
     private int collegeId;
+    private College college;
 }

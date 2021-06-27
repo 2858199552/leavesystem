@@ -22,11 +22,11 @@ import java.util.*;
 @WebServlet(urlPatterns = "/")
 public class DispatcherServlet extends HttpServlet {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private Map<String, GetDispatcher> getMappings = new HashMap<>();
 
-    private Map<String, PostDispatcher> postMapping = new HashMap<>();
+    private Map<String, PostDispatcher> postMappings = new HashMap<>();
 
     // 可指定package并自动扫描
     private List<Class<?>> controllers = List.of(IndexController.class, UserController.class);
@@ -38,7 +38,7 @@ public class DispatcherServlet extends HttpServlet {
      */
     @Override
     public void init() throws ServletException {
-        logger.info("info{}...", getClass().getSimpleName());
+        logger.info("init{}...", getClass().getSimpleName());
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 //        依次处理Controller：
@@ -84,7 +84,7 @@ public class DispatcherServlet extends HttpServlet {
                         }
                         String path = method.getAnnotation(PostMapping.class).value();
                         logger.info("Found POST:{} => {}", path, method);
-                        this.postMapping.put(path, new PostDispatcher(controllerInstance, method, method.getParameterTypes(), objectMapper));
+                        this.postMappings.put(path, new PostDispatcher(controllerInstance, method, method.getParameterTypes(), objectMapper));
                     }
                 }
             } catch (ReflectiveOperationException e) {
@@ -101,7 +101,7 @@ public class DispatcherServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        process(req, resp, this.postMapping);
+        process(req, resp, this.postMappings);
     }
 
     private void process(HttpServletRequest req, HttpServletResponse resp, Map<String, ? extends AbstractDispatcher> dispatcherMap) throws ServletException, IOException {
@@ -113,7 +113,7 @@ public class DispatcherServlet extends HttpServlet {
             resp.sendError(404);
             return;
         }
-        ModelAndView mv;
+        ModelAndView mv = null;
         try {
             mv = dispatcher.invoke(req, resp);
         } catch (ReflectiveOperationException e) {

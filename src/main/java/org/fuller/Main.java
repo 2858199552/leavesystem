@@ -8,6 +8,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.webresources.DirResourceSet;
 import org.apache.catalina.webresources.StandardRoot;
 import org.fuller.bean.User;
+import org.fuller.dao.TeacherDao;
 
 import javax.sql.DataSource;
 import java.io.File;

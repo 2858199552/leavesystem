@@ -33,7 +33,7 @@ $(function(){
 	<div class="lefttop"><span></span>通讯录</div>
     
     <dl class="leftmenu">
-        
+    {% if leaveSession != null %}
     <dd>
     <div class="title">
     <span><img src="/static/images/leftico01.png" /></span>基础信息
@@ -45,7 +45,7 @@ $(function(){
             <li><cite></cite><a href="/form" target="rightFrame">教师信息</a><i></i></li>
         </ul>    
     </dd>
-        
+    {% endif %}
     
     <dd>
     <div class="title">
