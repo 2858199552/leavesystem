@@ -1,9 +1,12 @@
 package org.fuller;
 
+import org.fuller.unit.JdbcUnit;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+@Deprecated
 public class DatabaseInitializer {
     public static void init() throws SQLException {
         //        初始化数据表
@@ -91,7 +94,7 @@ public class DatabaseInitializer {
                         "id INTEGER AUTO_INCREMENT NOT NULL PRIMARY KEY," +
                         "name VARCHAR(10) NOT NULL," +
                         "UNIQUE (name));"};
-        try (Connection conn = Main.ds.getConnection()) {
+        try (Connection conn = JdbcUnit.getInstance().getConnection()) {
             try (Statement ps = conn.createStatement()) {
 /*
                 无SQL语法高亮
@@ -108,7 +111,7 @@ public class DatabaseInitializer {
     }
 
     private static void initializeTable() throws SQLException {
-        try (Connection conn = Main.ds.getConnection()) {
+        try (Connection conn = JdbcUnit.getInstance().getConnection()) {
             try (Statement ps = conn.createStatement()) {
                 ps.addBatch("INSERT INTO menutypes(name) VALUES ('模块')");
                 ps.addBatch("INSERT INTO menutypes(name) VALUES ('菜单项')");

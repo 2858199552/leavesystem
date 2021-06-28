@@ -2,12 +2,14 @@ package org.fuller.controller;
 
 import org.fuller.bean.SignInBean;
 import org.fuller.bean.User;
+import org.fuller.entity.Grade;
+import org.fuller.entity.Role;
+import org.fuller.entity.Student;
 import org.fuller.entity.Teacher;
 import org.fuller.framework.GetMapping;
 import org.fuller.framework.ModelAndView;
 import org.fuller.framework.PostMapping;
-import org.fuller.service.TeacherService;
-import org.fuller.service.UserService;
+import org.fuller.service.*;
 import org.fuller.session.LeaveSession;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,16 +18,27 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 
 public class UserController {
+
+    public enum Login_Sign {
+        LOGIN_SIGN_IN,
+        LOGIN_SIGN_OUT,
+        LOGIN_SIGN_SUCCESS,
+        LOGIN_SIGN_USERNAME_ERROR,
+        LOGIN_SIGN_PASSWORD_ERROR,
+        LOGIN_SIGN_OTHER_ERROR
+    }
+    public static final int ROLE_SIGN_HEADTEACHER = 2;
+    public static final int ROLE_SIGN_FDY = 3;
+    public static final int ROLE_SIGN_LANDER = 4;
 
     public static final String KEY_USER = "__user__";
     public static final String KEY_USER_ADMIN = "admin";
 
     private UserService userService = new UserService();
-    private TeacherService teacherService = new TeacherService();
 
     @GetMapping("/")
     public ModelAndView index(HttpSession session) {
@@ -39,45 +52,98 @@ public class UserController {
 
     @GetMapping("/login")
     public ModelAndView login(HttpSession session) {
-        System.out.println("----------------------");
+//        return new ModelAndView("redirect:/error");
         return new ModelAndView("login.html");
     }
 
     @PostMapping("/login")
-    public ModelAndView doLogin(SignInBean bean, HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
-//        String num = request.getParameter("num");
-//        String password = request.getParameter("password");
-//        String num = bean.num;
-//        String password = bean.password;
-        String num = "admin";
-        String password = "11111";
-        if (num.trim().length() == 5) {
-            teacherLogin(num, password, response);
-        } else {
-            studentLogin(num, password, response);
-        }
-        // TODO: 2021/6/26 按照老师要求：需要检测是否是超级管理员 video:2/2/48:00
+    public ModelAndView doLogin(/*SignInBean bean,*/ HttpServletRequest request, HttpServletResponse response, HttpSession session) throws Exception {
+        System.out.println("this is post");
+        Login_Sign login_sign = null;
         try {
+//            String num = bean.num;
+//            String password = bean.password;
+            String num = request.getParameter("num");
+            String password = request.getParameter("password");
+            if (num.trim().length() == 5) {
+                login_sign = teacherLogin(num, password, request, response);
+            } else {
+                login_sign = studentLogin(num, password, request, response);
+            }
+            if (login_sign != Login_Sign.LOGIN_SIGN_SUCCESS) {
+                throw new RuntimeException();
+            }
 //            User user = userService.getUserByEmail(bean.email);
 //            session.setAttribute(KEY_USER, user);
-            LeaveSession leaveSession = new LeaveSession();
-            session.setAttribute("leaveSession", leaveSession);
         } catch (Exception e) {
-            return new ModelAndView("login.html");
+//                request.setAttribute("title", "login");
+//                request.setAttribute("error", "sign_false");
+//                request.getRequestDispatcher("/error.html").forward(request, response);
+            String error = null;
+            switch (login_sign) {
+                case LOGIN_SIGN_PASSWORD_ERROR: error = "密码错误"; break;
+                case LOGIN_SIGN_USERNAME_ERROR: error = "用户不存在"; break;
+                case LOGIN_SIGN_OTHER_ERROR: error = "其他错误"; break;
+            }
+            return new ModelAndView("login.html", "error", error);
         }
-        return null;
+        return new ModelAndView("redirect:/main");
     }
 
     // region login
-    private void teacherLogin(String num, String password, HttpServletResponse response) throws SQLException {
-        Teacher teacher = teacherService.getByNum(num);
-        if (teacher != null) {
-            System.out.println("login success");
+    private Login_Sign teacherLogin(String num, String password, HttpServletRequest request, HttpServletResponse response) throws SQLException {
+        Teacher teacher = TeacherService.getInstance().getByNum(num);
+        if (teacher == null) {
+            return Login_Sign.LOGIN_SIGN_USERNAME_ERROR;
         }
+        if (!password.equals(teacher.getPassword())) {
+//            这样可能更好，但还是和老师保持统一
+//            throw new RuntimeException("密码错误");
+            return Login_Sign.LOGIN_SIGN_PASSWORD_ERROR;
+        }
+
+        LeaveSession leaveSession = new LeaveSession();
+        leaveSession.setLdCollegeId(teacher.getCollegeId());
+        leaveSession.setUserType(LeaveSession.USER_TYPE_TEACHER);
+        leaveSession.setTeacher(teacher);
+        List<Role> roles = RoleService.getInstance().getRolesByUserId(teacher.getId());
+        leaveSession.setRoles(roles);
+        for (var role : roles) {
+            if (role.getId() == ROLE_SIGN_HEADTEACHER) {
+                leaveSession.setHeadTeacher(true);
+                List<Grade> grades = GradeService.getInstance().getGradesByUserId(teacher.getId());
+                StringBuilder strGrades = new StringBuilder();
+                for (var grade : grades) {
+                    strGrades.append(grade.getId());
+                    strGrades.append(",");
+                }
+                strGrades.replace(strGrades.length() - 1, strGrades.length(), "");
+                leaveSession.setManageGrades(strGrades.toString());
+            } else if (role.getId() == ROLE_SIGN_FDY) {
+                leaveSession.setFdy(true);
+            } else if (role.getId() == ROLE_SIGN_LANDER) {
+                leaveSession.setLander(true);
+            }
+        }
+
+//        4. 查找权限
+        leaveSession.setPermissions(PermissionService.getInstance().getPermissionByTeacherId(teacher.getId()));
+        HttpSession session = request.getSession();
+        session.setAttribute("leaveSession", leaveSession);
+        return Login_Sign.LOGIN_SIGN_SUCCESS;
     }
 
-    private void studentLogin(String num, String password, HttpServletResponse response) {
-
+    private Login_Sign studentLogin(String num, String password, HttpServletRequest request, HttpServletResponse response) throws SQLException {
+        Student student = StudentService.getInstance().getByNum(num);
+        if (student == null) {
+            return Login_Sign.LOGIN_SIGN_USERNAME_ERROR;
+        }
+        if (!password.equals(student.getPassword())) {
+//            这样可能更好，但还是和老师保持统一
+//            throw new RuntimeException("密码错误");
+            return Login_Sign.LOGIN_SIGN_PASSWORD_ERROR;
+        }
+        return Login_Sign.LOGIN_SIGN_PASSWORD_ERROR;
     }
     // endregion
 

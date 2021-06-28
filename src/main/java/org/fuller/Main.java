@@ -9,6 +9,7 @@ import org.apache.catalina.webresources.DirResourceSet;
 import org.apache.catalina.webresources.StandardRoot;
 import org.fuller.bean.User;
 import org.fuller.dao.TeacherDao;
+import org.fuller.unit.JdbcUnit;
 
 import javax.sql.DataSource;
 import java.io.File;
@@ -21,9 +22,7 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) throws Exception {
 
-        HikariStart();
-        DatabaseInitializer.init();
-
+//        DatabaseInitializer.init();
         tomcatStart();
     }
 
@@ -39,27 +38,4 @@ public class Main {
         tomcat.start();
         tomcat.getServer().await();
     }
-
-    private static void HikariStart() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl(jdbcUrl);
-        config.setUsername(jdbcUsername);
-        config.setPassword(jdbcPassword);
-        config.addDataSourceProperty("cachePrepStmts", "true");
-        config.addDataSourceProperty("prepStmtCacheSize", "100");
-        config.addDataSourceProperty("maximumPoolSize", "10");
-        ds = new HikariDataSource(config);
-    }
-
-    @Deprecated
-    public static Connection openConnection() throws SQLException {
-        Connection conn = DriverManager.getConnection(jdbcUrl, jdbcUsername, jdbcPassword);
-        return conn;
-    }
-
-    static final String jdbcUrl = "jdbc:mysql://localhost:3306/leavesystem";
-    static final String jdbcUsername = "root";
-    static final String jdbcPassword = "password";
-
-    public static DataSource ds;
 }

@@ -15,27 +15,32 @@
     })
 });
 </script>
-    <script>
-        $(function () {
-            $('#loginForm').submit(function (e) {
-                e.preventDefault();
-                var data = {
-                    num: $('#num').val(),
-                    password: $('#password').val()
-                };
-                $.ajax({
-                    type: 'POST',
-                    url: '/login',
-                    data: JSON.stringify(data),
-                    success: function (resp) {
-                        location.assign('/main');
-                    },
-                    contentType: 'application/json',
-                    dataType: 'json'
-                });
-            });
-        });
-    </script>
+<!--    <script>-->
+<!--        $(function () {-->
+<!--            $('#loginForm').submit(function (e) {-->
+<!--                e.preventDefault();-->
+<!--                var data = {-->
+<!--                    num: $('#num').val(),-->
+<!--                    password: $('#password').val()-->
+<!--                };-->
+<!--                $.ajax({-->
+<!--                    type: 'POST',-->
+<!--                    url: '/login',-->
+<!--                    data: JSON.stringify(data),-->
+<!--                    success: function (resp) {-->
+<!--                        if (resp.error) {-->
+<!--                            location.assign("/error");-->
+<!--                            $('#error').text(resp.error);-->
+<!--                        } else {-->
+<!--                            location.assign('/main');-->
+<!--                        }-->
+<!--                    },-->
+<!--                    contentType: 'application/json',-->
+<!--                    dataType: 'json'-->
+<!--                });-->
+<!--            });-->
+<!--        });-->
+<!--    </script>-->
 
 </head>
 
@@ -63,9 +68,12 @@
     <span class="systemlogo"></span> 
        
     <div class="loginbox">
-    
+
     <ul>
-	<form id="loginForm">
+    {% if error != null %}
+    <li class="text"><p>{{ error }}</p></li>
+    {% endif %}
+	<form id="loginForm" action="/login" method="post">
     <li><input id="num" name="num" type="text" class="loginuser" value="admin" /></li>
     <li><input id="password" name="password" type="text" class="loginpwd" value="密码" type="password"></li>
     <li><input type="submit" class="loginbtn" value="登录" /><label><input name="" type="checkbox" value="" checked="checked" />记住密码</label><label><a href="#">忘记密码？</a></label></li>

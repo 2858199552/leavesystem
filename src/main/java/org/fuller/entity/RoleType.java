@@ -3,9 +3,7 @@ package org.fuller.entity;
 import lombok.Data;
 
 @Data
-public class Role {
+public class RoleType {
     private int id;
     private String name;
-    private String remark;
-    private int areaType;
 }

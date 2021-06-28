@@ -2,6 +2,7 @@ package org.fuller.service;
 
 import org.fuller.Main;
 import org.fuller.bean.User;
+import org.fuller.unit.JdbcUnit;
 
 import java.sql.*;
 
@@ -9,7 +10,7 @@ import java.sql.*;
 public class UserService {
 
     public User getUserByNumber(String number) throws SQLException {
-        try (Connection conn = Main.ds.getConnection()) {
+        try (Connection conn = JdbcUnit.getInstance().getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement("SELECT id, name, num, password FROM students WHERE num = ?")) {
                 ps.setObject(1, number);
                 try (ResultSet rs = ps.executeQuery()) {
@@ -43,7 +44,7 @@ public class UserService {
 
     public User register(String email, String password) throws SQLException {
         User user = new User(email, password, System.currentTimeMillis());
-        try (Connection conn = Main.ds.getConnection()) {
+        try (Connection conn = JdbcUnit.getInstance().getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement("INSERT INTO students (name, num, password, gradeId, gender) VALUES (?, ?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS)) {
                 ps.setObject(1, user.getEmail());
                 ps.setObject(2, user.getPassword());

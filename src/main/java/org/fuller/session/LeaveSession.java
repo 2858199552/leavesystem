@@ -21,14 +21,12 @@ public class LeaveSession {
     private Teacher teacher;
     private List<Role> roles = new ArrayList<>();
 
-
-    {
-        permissions.add("baseInfo");
-    }
-
-    private String manageClasses;
+    private String manageGrades;
     private int fdyCollegeId;
     private int ldCollegeId;
+    private boolean isHeadTeacher;
+    private boolean isFdy;
+    private boolean isLander;
 
     public boolean hasPermission(String permission) {
         return permissions.contains(permission);
