@@ -51,8 +51,14 @@ public class UserController {
     }
 
     @GetMapping("/login")
-    public ModelAndView login(HttpSession session) {
-//        return new ModelAndView("redirect:/error");
+    public ModelAndView login(HttpServletRequest request , HttpSession session) {
+//        当前MVC还不能处理/login?option=1,故用get:/loginout
+//        int option = Integer.parseInt(request.getParameter("option"));
+//        switch (Login_Sign.values()[option]) {
+//            case LOGIN_SIGN_OUT:
+//                session.invalidate();
+//                break;
+//        }
         return new ModelAndView("login.html");
     }
 
@@ -103,7 +109,7 @@ public class UserController {
         }
 
         LeaveSession leaveSession = new LeaveSession();
-        leaveSession.setLdCollegeId(teacher.getCollegeId());
+        leaveSession.setCollegeId(teacher.getCollegeId());
         leaveSession.setUserType(LeaveSession.USER_TYPE_TEACHER);
         leaveSession.setTeacher(teacher);
         List<Role> roles = RoleService.getInstance().getRolesByUserId(teacher.getId());
@@ -143,9 +149,22 @@ public class UserController {
 //            throw new RuntimeException("密码错误");
             return Login_Sign.LOGIN_SIGN_PASSWORD_ERROR;
         }
-        return Login_Sign.LOGIN_SIGN_PASSWORD_ERROR;
+        LeaveSession leaveSession = new LeaveSession();
+        leaveSession.setUserType(LeaveSession.USER_TYPE_STUDENT);
+        leaveSession.setStudent(student);
+        leaveSession.setPermissions(PermissionService.getInstance().getPermissionByStudentId());
+        HttpSession session = request.getSession();
+        session.setAttribute("leaveSession", leaveSession);
+        return Login_Sign.LOGIN_SIGN_SUCCESS;
     }
     // endregion
+
+    @GetMapping("/loginOut")
+    public ModelAndView loginOut(HttpSession session) {
+//        session.invalidate();
+        session.removeAttribute("leaveSession");
+        return new ModelAndView("redirect:/login");
+    }
 
     @GetMapping("/register")
     public ModelAndView register() {
@@ -166,8 +185,9 @@ public class UserController {
     }
 
     @GetMapping("/top")
-    public ModelAndView topPage() {
-        return new ModelAndView("top.html");
+    public ModelAndView topPage(HttpSession session) {
+        LeaveSession leaveSession = (LeaveSession) session.getAttribute("leaveSession");
+        return new ModelAndView("top.html", "leaveSession", leaveSession);
     }
 
     @GetMapping("/left")

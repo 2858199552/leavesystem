@@ -37,14 +37,16 @@ $(function(){
     <ul>
     <li><span><img src="/static/images/help.png" title="帮助" class="helpimg"/></span><a href="#">帮助</a></li>
     <li><a href="#">关于</a></li>
-    <li><a href="login.html" target="_parent">退出</a></li>
+    <li><a href="/loginOut" target="_parent">退出</a></li>
     </ul>
      
     <div class="user">
-    <span>admin</span>
-    <i>消息</i>
-    <b>5</b>
-    </div>    
+        {% if leaveSession.userType == 1 %}
+        <span>欢迎你：{{ leaveSession.teacher.name }}</span>
+        {% elseif leaveSession.userType == 2 %}
+        <span>欢迎你：{{ leaveSession.student.name }}</span>
+        {% endif %}
+    </div>
     
     </div>
 

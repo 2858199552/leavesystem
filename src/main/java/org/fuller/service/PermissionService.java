@@ -19,4 +19,8 @@ public class PermissionService {
     public Set<String> getPermissionByTeacherId(int userId) throws SQLException {
         return PermissonDao.getInstance().getPermissionByTeacherId(userId);
     }
+
+    public Set<String> getPermissionByStudentId() throws SQLException {
+        return PermissonDao.getInstance().getPermissionByStudentRoleId();
+    }
 }

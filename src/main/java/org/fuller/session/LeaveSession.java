@@ -22,8 +22,7 @@ public class LeaveSession {
     private List<Role> roles = new ArrayList<>();
 
     private String manageGrades;
-    private int fdyCollegeId;
-    private int ldCollegeId;
+    private int collegeId;
     private boolean isHeadTeacher;
     private boolean isFdy;
     private boolean isLander;

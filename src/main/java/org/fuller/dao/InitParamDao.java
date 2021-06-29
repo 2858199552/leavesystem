@@ -21,23 +21,23 @@ public class InitParamDao {
         return instance;
     }
 
-//    public List<LeaveApplicationResultType> getLeaveApplicationResultType() throws SQLException {
-//        List<LeaveApplicationResultType> larts = new ArrayList<LeaveApplicationResultType>();
-//        try (Connection conn = JdbcUnit.getInstance().getConnection()) {
-//            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM applicationresults_type")) {
-//                ResultSet set = ps.executeQuery();
-//                while (set.next()) {
-//                    LeaveApplicationResultType sexType = new LeaveApplicationResultType();
-//                    sexType.setId(set.getInt(1));
-//                    sexType.setApplicationResult(set.getString(2));
-//                    larts.add(sexType);
-//                }
-//            }
-//        }
-//        return larts;
-//    }
+    public List<ApplicationResult> getApplicationResult() throws SQLException {
+        List<ApplicationResult> results = new ArrayList<ApplicationResult>();
+        try (Connection conn = JdbcUnit.getInstance().getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM applicationresults")) {
+                ResultSet set = ps.executeQuery();
+                while (set.next()) {
+                    ApplicationResult genderType = new ApplicationResult();
+                    genderType.setId(set.getInt(1));
+                    genderType.setName(set.getString(2));
+                    results.add(genderType);
+                }
+            }
+        }
+        return results;
+    }
 
-    public List<GenderType> getSexType() throws SQLException {
+    public List<GenderType> getGenderType() throws SQLException {
         List<GenderType> genderTypes = new ArrayList<>();
         try (Connection conn = JdbcUnit.getInstance().getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM gendertypes")) {
@@ -85,13 +85,13 @@ public class InitParamDao {
         return roleTypes;
     }
 
-    public List<ApplicationResult> getLeaveApplicationType() throws SQLException {
-        List<ApplicationResult> applicationResults = new ArrayList<>();
+    public List<LeaveApplicationType> getLeaveApplicationType() throws SQLException {
+        List<LeaveApplicationType> applicationResults = new ArrayList<>();
         try (Connection conn = JdbcUnit.getInstance().getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM leaveapplicationtypes")) {
                 ResultSet set = ps.executeQuery();
                 while (set.next()) {
-                    ApplicationResult applicationResult = new ApplicationResult();
+                    LeaveApplicationType applicationResult = new LeaveApplicationType();
                     applicationResult.setId(set.getInt(1));
                     applicationResult.setName(set.getString(2));
                     applicationResults.add(applicationResult);

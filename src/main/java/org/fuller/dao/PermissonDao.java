@@ -51,7 +51,7 @@ public class PermissonDao {
                 ps.setInt(1, id);
                 ResultSet result = ps.executeQuery();
                 while(result.next()){
-                    String permission = new String(result.getString(1));
+                    String permission = result.getString(1);
                     set.add(permission);
                 }
             }
