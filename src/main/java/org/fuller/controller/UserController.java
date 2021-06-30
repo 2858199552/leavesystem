@@ -196,11 +196,6 @@ public class UserController {
         return new ModelAndView("left.html", "leaveSession", leaveSession);
     }
 
-    @GetMapping("/right")
-    public ModelAndView rightPage() {
-        return new ModelAndView("right.html");
-    }
-
     @GetMapping("/index")
     public ModelAndView indexPage() {
         return new ModelAndView("index.html");
@@ -214,11 +209,6 @@ public class UserController {
     @GetMapping("/imgtable")
     public ModelAndView imgtablePage() {
         return new ModelAndView("imgtable.html");
-    }
-
-    @GetMapping("/form")
-    public ModelAndView formPage() {
-        return new ModelAndView("form.html");
     }
 
     @GetMapping("/imglist")

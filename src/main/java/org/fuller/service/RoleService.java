@@ -20,4 +20,12 @@ public class RoleService {
     public List<Role> getRolesByUserId(int userId) throws SQLException {
         return RoleDao.getInstance().getRolesByUserId(userId);
     }
+
+    public List<Role> getAll() throws SQLException {
+        return RoleDao.getInstance().getAll();
+    }
+
+    public boolean add(Role role) throws SQLException {
+        return RoleDao.getInstance().add(role);
+    }
 }

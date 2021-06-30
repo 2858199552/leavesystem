@@ -3,4 +3,13 @@
         "http://java.sun.com/dtd/web-app_2_3.dtd">
 <web-app>
     <display-name>Archetype Created Web Application</display-name>
+    <servlet>
+        <servlet-name>InitiateServlet</servlet-name>
+        <servlet-class>org.fuller.servlet.InitiateServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>InitiateServlet</servlet-name>
+        <url-pattern>/InitiateServlet</url-pattern>
+    </servlet-mapping>
 </web-app>

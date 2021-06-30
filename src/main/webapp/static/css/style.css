@@ -92,7 +92,7 @@ h2{font-weight:normal;}
 .title{cursor:pointer;}
 
 
-/*right.html*/
+/*roleList.html*/
 .place{height:40px; background:url(../images/righttop.gif) repeat-x;}
 .place span{line-height:40px; font-weight:bold;float:left; margin-left:12px;}
 .placeul li{float:left; line-height:40px; padding-left:7px; padding-right:12px; background:url(../images/rlist.gif) no-repeat right;}

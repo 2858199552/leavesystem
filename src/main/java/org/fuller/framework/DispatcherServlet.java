@@ -3,6 +3,7 @@ package org.fuller.framework;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.fuller.controller.IndexController;
+import org.fuller.controller.RoleController;
 import org.fuller.controller.UserController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ public class DispatcherServlet extends HttpServlet {
     private Map<String, PostDispatcher> postMappings = new HashMap<>();
 
     // 可指定package并自动扫描
-    private List<Class<?>> controllers = List.of(IndexController.class, UserController.class);
+    private List<Class<?>> controllers = List.of(IndexController.class, UserController.class, RoleController.class);
 
     private ViewEngine viewEngine;
 

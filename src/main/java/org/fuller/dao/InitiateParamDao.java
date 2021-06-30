@@ -10,14 +10,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class InitParamDao {
-    private InitParamDao(){};
-    private static InitParamDao instance;
+public class InitiateParamDao {
+    private InitiateParamDao(){};
+    private static InitiateParamDao instance;
     static {
-        instance = new InitParamDao();
+        instance = new InitiateParamDao();
     }
 
-    public static InitParamDao getInstance() {
+    public static InitiateParamDao getInstance() {
         return instance;
     }
 

@@ -55,17 +55,18 @@ $(function(){
     </dd>
     {% endif %}
 
+    {% if leaveSession != null and leaveSession.hasPermission('system') %}
     <dd>
     <div class="title">
-    <span><img src="/static/images/leftico02.png" /></span>其他设置
+    <span><img src="/static/images/leftico02.png" /></span>系统管理
     </div>
     <ul class="menuson">
-        <li><cite></cite><a href="#">编辑内容</a><i></i></li>
-        <li><cite></cite><a href="#">发布信息</a><i></i></li>
-        <li><cite></cite><a href="#">档案列表显示</a><i></i></li>
-        </ul>     
+        {% if leaveSession.hasPermission('system.role') %}
+        <li><cite></cite><a href="/role/query" target="rightFrame">角色管理</a><i></i></li>
+        {% endif %}
+        </ul>
     </dd> 
-    
+    {% endif %}
     
     <dd><div class="title"><span><img src="/static/images/leftico03.png" /></span>编辑器</div>
     <ul class="menuson">
