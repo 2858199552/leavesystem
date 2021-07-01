@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>权限管理</title>
+<link href="/static/css/style.css" rel="stylesheet" type="text/css" />
+    <style>
+        .menu_module{
+            padding-left:20px;
+            margin-botton:5px;
+        }
+
+        .menu_item{
+            padding-left:20px;
+            margin-botton:5px;
+        }
+        .menu_button{
+            padding-left:20px;
+            margin-botton:5px;
+        }
+    </style>
+</head>
+
+<body>
+
+	<div class="place">
+    <span>位置：</span>
+    <ul class="placeul">
+    <li><a href="#">首页</a></li>
+    <li><a href="/role/query">角色</a></li>
+    <li><a href="/role/authorize">权限管理</a></li>
+    </ul>
+    </div>
+    
+    <div class="formbody">
+    
+    <div class="formtitle"><span>基本信息</span></div>
+        <form action="/role/authorize" method="post">
+            <input type="hidden" name="id" value="{{ role.id }}"/>
+            {% for module in menus %}
+            <div class="menu_module">
+                <input type="checkbox" name="permission" value="{{ module.id }}" {{ roles.hasPermission(module.permission) ? "checked='checked'" : "" }}/>{{ module.name }}
+                {% for menuItem in module.subMenus %}
+                <div class="menu_item">
+                    <input type="checkbox" name="permission" value="{{ menuItem.id }}" {{ roles.hasPermission(menuItem.permission) ? "checked='checked'" : "" }}/>{{ menuItem.name }}
+                    {% for button in menuItem.subMenus %}
+                    <div class="menu_button">
+                        <input type="checkbox" name="permission" value="{{ button.id }}" {{ roles.hasPermission(button.permission) ? "checked='checked'" : "" }}/>{{ button.name }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </form>
+    </div>
+</body>
+
+</html>

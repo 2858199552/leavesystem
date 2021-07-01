@@ -28,4 +28,16 @@ public class RoleService {
     public boolean add(Role role) throws SQLException {
         return RoleDao.getInstance().add(role);
     }
+
+    public boolean update(Role role) throws SQLException {
+        return RoleDao.getInstance().update(role);
+    }
+
+    public Role getById(int roleId) throws SQLException {
+        return RoleDao.getInstance().getById(roleId);
+    }
+
+    public boolean deleteById(int roleId) throws SQLException {
+        return RoleDao.getInstance().deleteById(roleId);
+    }
 }

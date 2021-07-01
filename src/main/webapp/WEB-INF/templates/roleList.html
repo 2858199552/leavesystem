@@ -68,16 +68,16 @@ $(document).ready(function(){
         <tbody>
         {% for role in roles %}
             <tr>
-                <td>{{ loop.index }}</td>
+                <td>{{ loop.index + 1 }}</td>
                 <td>{{ role.name }}</td>
                 <td>{{ role.remark }}</td>
-                <td>{{ role.areaType }}</td>
+                <td>{{ role.getTypeName(roleTypes, role.areaType) }}</td>
 
                 <td>
                     <a href="/role/query" class="tablelink">查看</a>
-                    <a href="/role/update" class="tablelink">修改</a>
-                    <a href="/role/authorize" class="tablelink">授权</a>
-                    <a href="#" class="tablelink">删除</a></td>
+                    <a href="/role/update?id={{ role.id }}" class="tablelink">修改</a>
+                    <a href="/role/authorize?id={{ role.id }}" class="tablelink">授权</a>
+                    <a href="/role/delete?id={{ role.id }}" class="tablelink">删除</a></td>
             </tr>
         {% endfor %}
         </tbody>

@@ -62,7 +62,8 @@ public class DispatcherServlet extends HttpServlet {
                                 );
                             }
                         }
-                        String[] parameterNames = Arrays.stream(method.getParameterTypes()).map(Class::getName).toArray(String[]::new);
+                        // 只能获取到类似arg1的参数名 编译器压缩，解决:javac -parameters
+                        String[] parameterNames = Arrays.stream(method.getParameters()).map(p -> p.getName()).toArray(String[]::new);
                         String path = method.getAnnotation(GetMapping.class).value();
                         logger.info("Found GET:{} => {}", path, method);
                         this.getMappings.put(path, new GetDispatcher(controllerInstance, method, parameterNames, method.getParameterTypes()));
@@ -109,6 +110,13 @@ public class DispatcherServlet extends HttpServlet {
         resp.setContentType("text/html");
         resp.setCharacterEncoding("UTF-8");
         String path = req.getRequestURI().substring(req.getContextPath().length());
+//         需要对路径进行解析，删除参数?后字段
+        for (int i = 0; i < path.length(); i++) {
+            if (path.charAt(i) == '?') {
+                path = path.substring(0, i);
+                break;
+            }
+        }
         AbstractDispatcher dispatcher = dispatcherMap.get(path);
         if (dispatcher == null) {
             resp.sendError(404);

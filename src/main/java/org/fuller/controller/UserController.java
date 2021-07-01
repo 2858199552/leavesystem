@@ -242,8 +242,8 @@ public class UserController {
     }
 
     @GetMapping("/error")
-    public ModelAndView errorPage() {
-        return new ModelAndView("error.html");
+    public ModelAndView errorPage(HttpSession session) {
+        return new ModelAndView("error.html", (Map<String, Object>) session.getAttribute("errors"));
     }
 
     //endregion

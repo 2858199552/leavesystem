@@ -1,18 +1,22 @@
 package org.fuller.controller;
 
+import org.fuller.entity.Menu;
 import org.fuller.entity.Role;
 import org.fuller.entity.RoleType;
 import org.fuller.framework.GetMapping;
 import org.fuller.framework.ModelAndView;
 import org.fuller.framework.PostMapping;
+import org.fuller.service.MenuService;
 import org.fuller.service.RoleService;
 import org.fuller.servlet.InitiateServlet;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public class RoleController {
     private static final long serialVersionUID = 1;
@@ -70,9 +74,10 @@ public class RoleController {
 
     // region option method
     @GetMapping("/role/query")
-    public ModelAndView query() throws SQLException {
+    public ModelAndView query(HttpServletRequest request) throws SQLException {
         List<Role> roles = RoleService.getInstance().getAll();
-        return new ModelAndView("roleList.html", "roles", roles);
+        List<RoleType> roleTypes = (List<RoleType>) request.getServletContext().getAttribute("roleTypes");
+        return new ModelAndView("roleList.html", Map.of("roles", roles, "roleTypes", roleTypes));
     }
 
     @GetMapping("/role/add")
@@ -80,52 +85,67 @@ public class RoleController {
         return new ModelAndView("addForm.html", "roleTypes", request.getServletContext().getAttribute("roleTypes"/* InitiateServlet.SET_ROLE_RESULTS */));
     }
 
-    @GetMapping("/role/doAdd")
-    public ModelAndView doAdd(HttpServletRequest request, HttpServletResponse response) throws SQLException {
+    @PostMapping("/role/add")
+    public ModelAndView doAdd(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws SQLException {
         Role role = new Role();
         role.parse(request);
         if (RoleService.getInstance().add(role)) {
-            request.setAttribute("title", "添加角色");
-            request.setAttribute("message", "添加成功");
-            request.setAttribute("url", "/role/query");
-            return new ModelAndView("error.html");
+            session.setAttribute("errors", Map.of("title", "添加角色", "message", "添加成功", "url", "/role/query"));
+            return new ModelAndView("redirect:/error");
         } else {
-            // TODO: 2021/6/30 直接看 6
-            request.setAttribute("title", "添加角色");
-            request.setAttribute("message", "添加失败");
-            request.setAttribute("url", "/role/query");
-            return new ModelAndView("error.html");
+            session.setAttribute("errors", Map.of("title", "添加角色", "message", "添加失败", "url", "/role/query"));
+            return new ModelAndView("redirect:/error");
         }
     }
 
-    @GetMapping("/role/query")
-    public void update(HttpServletRequest request, HttpServletResponse response) {
-
+    @GetMapping("/role/update")
+    public ModelAndView update(HttpServletRequest request, HttpServletResponse response) throws SQLException {
+        int roleId = Integer.parseInt(request.getParameter("id"));
+        Role role = RoleService.getInstance().getById(roleId);
+        List<RoleType> roleTypes = (List<RoleType>) request.getServletContext().getAttribute("roleTypes");
+        return new ModelAndView("updateForm.html", Map.of("role", role, "roleTypes", roleTypes));
     }
 
-    @GetMapping("/role/doUpdate")
-    public void doUpdate(HttpServletRequest request, HttpServletResponse response) {
-
+    @PostMapping("/role/update")
+    public ModelAndView doUpdate(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws SQLException {
+        Role role = new Role();
+        role.parse(request);
+        if (RoleService.getInstance().update(role)) {
+            session.setAttribute("errors", Map.of("title", "修改角色", "message", "修改成功", "url", "/role/query"));
+            return new ModelAndView("redirect:/error");
+        } else {
+            session.setAttribute("errors", Map.of("title", "修改角色", "message", "修改失败", "url", "/role/query"));
+            return new ModelAndView("redirect:/error");
+        }
     }
 
     @GetMapping("/role/delete")
-    public void delete(HttpServletRequest request, HttpServletResponse response) {
-
+    public ModelAndView delete(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws SQLException {
+        int roleId = Integer.parseInt(request.getParameter("id"));
+        if (RoleService.getInstance().deleteById(roleId)) {
+            session.setAttribute("errors", Map.of("title", "删除角色", "message", "删除成功", "url", "/role/query"));
+        } else {
+            session.setAttribute("errors", Map.of("title", "删除角色", "message", "删除失败", "url", "/role/query"));
+        }
+        return new ModelAndView("redirect:/error");
     }
 
     @GetMapping("/role/authorize")
-    public void authorize(HttpServletRequest request, HttpServletResponse response) {
-
+    public ModelAndView authorize(HttpServletRequest request, HttpServletResponse response) throws SQLException {
+        List<Menu> menus = MenuService.getInstance().getAll();
+//        request.setAttribute("menus", menus);
+        return new ModelAndView("authorize.html", Map.of("menus", menus, "roles", request.getServletContext().getAttribute("roles")));
+        // TODO: 2021/7/1 roles还没有完成，接着看13
     }
 
-    @GetMapping("/role/doAuthorize")
-    public void doAuthorize(HttpServletRequest request, HttpServletResponse response) {
-
+    @PostMapping("/role/authorize")
+    public ModelAndView doAuthorize(HttpServletRequest request, HttpServletResponse response) {
+        return null;
     }
-
-    @GetMapping("/role/detail")
-    public void detail(HttpServletRequest request, HttpServletResponse response) {
-
-    }
+//
+//    @GetMapping("/role/detail")
+//    public ModelAndView detail(HttpServletRequest request, HttpServletResponse response) {
+//
+//    }
     // endregion
 }

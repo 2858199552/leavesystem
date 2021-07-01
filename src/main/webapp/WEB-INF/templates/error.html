@@ -25,7 +25,7 @@
     <span>位置：</span>
     <ul class="placeul">
     <li><a href="#">首页</a></li>
-    <li><a href="#">404错误提示</a></li>
+    <li><a href="#">消息提示</a></li>
     </ul>
     </div>
     
@@ -34,9 +34,9 @@
     <div>
         <p id="error"></p>
     </div>
-    <h2>非常遗憾，您访问的页面不存在！</h2>
-    <p>看到这个提示，就自认倒霉吧!</p>
-    <div class="reindex"><a href="main.html" target="_parent">返回首页</a></div>
+    <h2>{{ title }}</h2>
+    <p>{{ message }}</p>
+    <div class="reindex"><a href="{{ url }}" target="rightFrame">返回</a></div>
     
     </div>
 

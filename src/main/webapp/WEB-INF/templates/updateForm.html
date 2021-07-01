@@ -13,23 +13,24 @@
     <ul class="placeul">
     <li><a href="#">首页</a></li>
     <li><a href="/role/query">角色</a></li>
-    <li><a href="/role/add">添加角色</a></li>
+    <li><a href="/role/update">修改角色</a></li>
     </ul>
     </div>
     
     <div class="formbody">
     
     <div class="formtitle"><span>基本信息</span></div>
-        <form action="/role/add" method="post">
-            <input type="hidden" name="option" value="3"/>
+        <form action="/role/update" method="post">
+<!--            <input type="hidden" name="option" value=""/>-->
+            <input type="hidden" name="id" value="{{ role.id }}"/>
             <ul class="forminfo">
-                <li><label>角色名</label><input name="name" type="text" class="dfinput" /><i>标题不能超过30个字符</i></li>
-                <li><label>备注</label><input name="remark" type="text" class="dfinput" /><i>多个关键字用,隔开</i></li>
+                <li><label>角色名</label><input name="name" type="text" value="{{ role.name }}" class="dfinput" /><i>标题不能超过30个字符</i></li>
+                <li><label>备注</label><input name="remark" type="text" value="{{ role.remark }}" class="dfinput" /><i>多个关键字用,隔开</i></li>
                 <li><label>管理域</label>
                     <cite>
-                        <select name="areaType">
+                        <select name="areaType" >
                             {% for roleType in roleTypes %}
-                            <option value="{{ roleType.id }}">{{ roleType.name }}</option>
+                            <option value="{{ roleType.id }}" {{ roleType.id == role.areaType ? 'selected=selected' : '' }}>{{ roleType.name }}</option>
                             {% endfor %}
                         </select>
                     </cite>

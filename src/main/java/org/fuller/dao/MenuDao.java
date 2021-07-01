@@ -1,8 +1,6 @@
 package org.fuller.dao;
 
-import org.fuller.entity.GenderType;
 import org.fuller.entity.Menu;
-import org.fuller.service.GradeService;
 import org.fuller.unit.JdbcUnit;
 
 import java.sql.Connection;
@@ -27,24 +25,24 @@ public class MenuDao {
     public List<Menu> getAll() throws SQLException {
         List<Menu> allMenu;
         //1、查询模块
-        allMenu = getByPid(MODULE_MENU_PARENT);
+        allMenu = getByPId(MODULE_MENU_PARENT);
         //2、查询菜单项
         List<Menu> menuItems;
         List<Menu> menuButtons;
 
         for (Menu menu : allMenu) {
-            menuItems = getByPid(menu.getId());
-//            menu.(menuItems);
+            menuItems = getByPId(menu.getId());
+            menu.setSubMenus(menuItems);
             for (Menu item : menuItems) {
-                menuButtons = getByPid(item.getId());
-//                item.setSubMenus(menuButtons);
+                menuButtons = getByPId(item.getId());
+                item.setSubMenus(menuButtons);
             }
         }
         return allMenu;
     }
 
-    public List<Menu> getByPid(int pid) throws SQLException{
-        List<Menu> menus = new ArrayList<Menu>();
+    public List<Menu> getByPId(int pid) throws SQLException{
+        List<Menu> menus = new ArrayList<>();
         try (Connection conn = JdbcUnit.getInstance().getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM menus WHERE pId = ?")) {
                 ps.setInt(1, pid);
