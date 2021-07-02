@@ -6,6 +6,7 @@ import lombok.Data;
 public class Grade {
     private int id;
     private String num;
+    private int periodId;
     private int belongToCollege;
     private int headTeacherId;
 }

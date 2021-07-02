@@ -40,4 +40,8 @@ public class RoleService {
     public boolean deleteById(int roleId) throws SQLException {
         return RoleDao.getInstance().deleteById(roleId);
     }
+
+    public boolean updateRolePermissionById(int roleId, String[] permissions) throws SQLException {
+        return RoleDao.getInstance().updateRolePermissionById(roleId, permissions);
+    }
 }

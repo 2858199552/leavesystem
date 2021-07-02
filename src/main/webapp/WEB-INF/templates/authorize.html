@@ -39,19 +39,20 @@
             <input type="hidden" name="id" value="{{ role.id }}"/>
             {% for module in menus %}
             <div class="menu_module">
-                <input type="checkbox" name="permission" value="{{ module.id }}" {{ roles.hasPermission(module.permission) ? "checked='checked'" : "" }}/>{{ module.name }}
+                <input type="checkbox" name="permission" value="{{ module.id }}" {{ role.hasPermission(module.permission) ? "checked='checked'" : "" }}/>{{ module.name }}
                 {% for menuItem in module.subMenus %}
                 <div class="menu_item">
-                    <input type="checkbox" name="permission" value="{{ menuItem.id }}" {{ roles.hasPermission(menuItem.permission) ? "checked='checked'" : "" }}/>{{ menuItem.name }}
+                    <input type="checkbox" name="permission" value="{{ menuItem.id }}" {{ role.hasPermission(menuItem.permission) ? "checked='checked'" : "" }}/>{{ menuItem.name }}
                     {% for button in menuItem.subMenus %}
                     <div class="menu_button">
-                        <input type="checkbox" name="permission" value="{{ button.id }}" {{ roles.hasPermission(button.permission) ? "checked='checked'" : "" }}/>{{ button.name }}
+                        <input type="checkbox" name="permission" value="{{ button.id }}" {{ role.hasPermission(button.permission) ? "checked='checked'" : "" }}/>{{ button.name }}
                     </div>
                     {% endfor %}
                 </div>
                 {% endfor %}
             </div>
             {% endfor %}
+            <li><label>&nbsp;</label><input type="submit" class="btn" value="确认保存"/></li>
         </form>
     </div>
 </body>

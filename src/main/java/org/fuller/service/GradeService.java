@@ -20,4 +20,8 @@ public class GradeService {
     public List<Grade> getGradesByUserId(int userId) throws SQLException {
         return GradeDao.getInstance().getGradesByUserId(userId);
     }
+
+    public List<Grade> getAll() throws SQLException {
+        return GradeDao.getInstance().getAll();
+    }
 }

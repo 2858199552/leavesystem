@@ -20,18 +20,18 @@ import java.util.Map;
 
 public class RoleController {
     private static final long serialVersionUID = 1;
-    private enum Option {
-        OPTION_QUERY,
-        OPTION_ADD,
-        OPTION_UPDATE,
-        OPTION_DELETE,
-        OPTION_AUTHORIZE,
-        OPTION_DO_ADD,
-        OPTION_DO_UPDATE,
-        OPTION_DO_AUTHORIZE,
-        OPTION_DETAIL
-    }
-
+//    private enum Option {
+//        OPTION_QUERY,
+//        OPTION_ADD,
+//        OPTION_DO_ADD,
+//        OPTION_UPDATE,
+//        OPTION_DO_UPDATE,
+//        OPTION_DELETE,
+//        OPTION_AUTHORIZE,
+//        OPTION_DO_AUTHORIZE,
+//        OPTION_DETAIL
+//    }
+// 该方法见CollegeController演示
 //    @GetMapping("/role")
 //    public ModelAndView option(HttpServletRequest request, HttpServletResponse response) {
 //        int option = Integer.parseInt(request.getParameter("option"));
@@ -91,11 +91,10 @@ public class RoleController {
         role.parse(request);
         if (RoleService.getInstance().add(role)) {
             session.setAttribute("errors", Map.of("title", "添加角色", "message", "添加成功", "url", "/role/query"));
-            return new ModelAndView("redirect:/error");
         } else {
             session.setAttribute("errors", Map.of("title", "添加角色", "message", "添加失败", "url", "/role/query"));
-            return new ModelAndView("redirect:/error");
         }
+        return new ModelAndView("redirect:/error");
     }
 
     @GetMapping("/role/update")
@@ -112,11 +111,10 @@ public class RoleController {
         role.parse(request);
         if (RoleService.getInstance().update(role)) {
             session.setAttribute("errors", Map.of("title", "修改角色", "message", "修改成功", "url", "/role/query"));
-            return new ModelAndView("redirect:/error");
         } else {
             session.setAttribute("errors", Map.of("title", "修改角色", "message", "修改失败", "url", "/role/query"));
-            return new ModelAndView("redirect:/error");
         }
+        return new ModelAndView("redirect:/error");
     }
 
     @GetMapping("/role/delete")
@@ -133,14 +131,21 @@ public class RoleController {
     @GetMapping("/role/authorize")
     public ModelAndView authorize(HttpServletRequest request, HttpServletResponse response) throws SQLException {
         List<Menu> menus = MenuService.getInstance().getAll();
-//        request.setAttribute("menus", menus);
-        return new ModelAndView("authorize.html", Map.of("menus", menus, "roles", request.getServletContext().getAttribute("roles")));
-        // TODO: 2021/7/1 roles还没有完成，接着看13
+        int roleId = Integer.parseInt(request.getParameter("id"));
+        Role role = RoleService.getInstance().getById(roleId);
+        return new ModelAndView("authorize.html", Map.of("menus", menus, "role", role));
     }
 
     @PostMapping("/role/authorize")
-    public ModelAndView doAuthorize(HttpServletRequest request, HttpServletResponse response) {
-        return null;
+    public ModelAndView doAuthorize(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws SQLException {
+        int roleId = Integer.parseInt(request.getParameter("id"));
+        String[] permissions = request.getParameterValues("permission");
+        if (RoleService.getInstance().updateRolePermissionById(roleId, permissions)) {
+            session.setAttribute("errors", Map.of("title", "修改权限", "message", "修改成功", "url", "/role/query"));
+        } else {
+            session.setAttribute("errors", Map.of("title", "修改权限", "message", "修改失败", "url", "/role/query"));
+        }
+        return new ModelAndView("redirect:/error");
     }
 //
 //    @GetMapping("/role/detail")

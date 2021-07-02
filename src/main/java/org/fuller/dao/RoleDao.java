@@ -61,7 +61,6 @@ public class RoleDao {
     }
 
     public boolean add(Role role) throws SQLException {
-        List<Role> roles = new ArrayList<>();
         int count = 0;
         try (Connection conn = JdbcUnit.getInstance().getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement("INSERT INTO roles (name, remark, areaType) VALUES (?, ?, ?)")) {
@@ -119,4 +118,43 @@ public class RoleDao {
         }
         return result == 1;
     }
+
+    public boolean updateRolePermissionById(int roleId, String[] permissions) throws SQLException {
+        Connection conn = JdbcUnit.getInstance().getConnection();
+        try {
+            conn.setAutoCommit(false);
+            deletePermission(roleId);
+            for (String permission : permissions) {
+                addPermission(roleId, permission);
+            }
+        } catch (SQLException e) {
+            conn.rollback();
+            return false;
+        } finally {
+            conn.setAutoCommit(true);
+            conn.close();
+        }
+        return true;
+    }
+
+    // region transaction element method
+    private void deletePermission(int roleId) throws SQLException {
+        try (Connection conn = JdbcUnit.getInstance().getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("DELETE FROM rolemenurelations WHERE roleId = ?")) {
+                ps.setInt(1, roleId);
+                ps.executeUpdate();
+            }
+        }
+    }
+
+    private void addPermission(int roleId, String permission) throws SQLException {
+        try (Connection conn = JdbcUnit.getInstance().getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("INSERT INTO rolemenurelations (roleId, menuId) VALUES (?, ?)")) {
+                ps.setInt(1, roleId);
+                ps.setInt(2, Integer.parseInt(permission));
+                ps.executeUpdate();
+            }
+        }
+    }
+    // endregion
 }

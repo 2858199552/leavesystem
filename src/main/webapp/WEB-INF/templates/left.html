@@ -40,7 +40,7 @@ $(function(){
     </div>
     	<ul class="menuson">
             {% if leaveSession.hasPermission('baseInfo.college') %}
-            <li><cite></cite><a href="/index" target="rightFrame">学院信息</a><i></i></li>
+            <li><cite></cite><a href="/college?option=0" target="rightFrame">学院信息</a><i></i></li>
             {% endif %}
             {% if leaveSession.hasPermission('baseInfo.grade') %}
             <li class="active"><cite></cite><a href="/right" target="rightFrame">班级信息</a><i></i></li>
