@@ -48,7 +48,7 @@ $(document).ready(function(){
     
     	<ul class="toolbar">
         <li class="click"><span><img src="/static/images/t01.png" /></span>
-            <a href="/college?option=1" class="tablelink">添加</a>
+            <a href="/college?option=7" class="tablelink">详情</a>
         </li>
         </ul>
     
@@ -58,28 +58,23 @@ $(document).ready(function(){
     <table class="tablelist">
     	<thead>
     	<tr>
-        <th>编号<i class="sort"><img src="/static/images/px.gif" /></i></th>
+<!--        <th>编号<i class="sort"><img src="/static/images/px.gif" /></i></th>-->
         <th>学院编号</th>
-        <th>学院名</th>
-        <th>操作</th>
+        <th>学院名称</th>
+        <th>联系电话</th>
         </tr>
         </thead>
         <tbody>
-        {% for college in colleges %}
-            <tr>
-                <td>{{ loop.index + 1 }}</td>
-                <td>{{ college.num }}</td>
-                <td>{{ college.name }}</td>
-
-                <td>
-                    <a href="/college?option=1&id={{ college.id }}" class="tablelink">添加</a>
-                    <a href="/college?option=3&id={{ college.id }}" class="tablelink">修改</a>
-                    <a href="/college?option=5&id={{ college.id }}" class="tablelink">删除</a>
-                    <a href="/college?option=6&id={{ college.id }}" class="tablelink">详情</a></td>
-            </tr>
-        {% endfor %}
+        <tr>
+            <td>{{ college.num }}</td>
+            <td>{{ college.name }}</td>
+            <td>{{ college.phone }}</td>
+        </tr>
         </tbody>
     </table>
+        <div class="reindex">
+            <a href="/college?option=0" target="rightFrame">返回</a>
+        </div>
 
     </div>
     

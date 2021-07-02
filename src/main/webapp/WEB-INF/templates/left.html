@@ -43,13 +43,13 @@ $(function(){
             <li><cite></cite><a href="/college?option=0" target="rightFrame">学院信息</a><i></i></li>
             {% endif %}
             {% if leaveSession.hasPermission('baseInfo.grade') %}
-            <li class="active"><cite></cite><a href="/right" target="rightFrame">班级信息</a><i></i></li>
+            <li class="active"><cite></cite><a href="/grade?option=0" target="rightFrame">班级信息</a><i></i></li>
             {% endif %}
             {% if leaveSession.hasPermission('baseInfo.student') %}
-            <li><cite></cite><a href="/imgtable" target="rightFrame">学生信息</a><i></i></li>
+            <li><cite></cite><a href="/student?option=0" target="rightFrame">学生信息</a><i></i></li>
             {% endif %}
             {% if leaveSession.hasPermission('baseInfo.teacher') %}
-            <li><cite></cite><a href="/form" target="rightFrame">教师信息</a><i></i></li>
+            <li><cite></cite><a href="/teacher?option=0" target="rightFrame">教师信息</a><i></i></li>
             {% endif %}
         </ul>    
     </dd>

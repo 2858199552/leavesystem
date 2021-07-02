@@ -2,6 +2,7 @@ package org.fuller.controller;
 
 import org.fuller.entity.College;
 import org.fuller.entity.Grade;
+import org.fuller.entity.Period;
 import org.fuller.framework.GetMapping;
 import org.fuller.framework.ModelAndView;
 import org.fuller.service.CollegeService;
@@ -23,6 +24,7 @@ public class GradeController {
         OPTION_UPDATE,
         OPTION_DO_UPDATE,
         OPTION_DELETE,
+        OPTION_HEADTEACHER,
         OPTION_DETAIL
     }
 
@@ -41,50 +43,63 @@ public class GradeController {
                     return update(request, response);
                 case OPTION_DO_UPDATE:
                     return doUpdate(request, response);
+                case OPTION_HEADTEACHER:
+                    break;
+                case OPTION_DETAIL:
+                    return detail(request, response);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return new ModelAndView("/grade/collegeList.html");
+        return new ModelAndView("/grade/gradeList.html");
     }
-
 
     private ModelAndView query(HttpServletRequest request, HttpServletResponse response) throws SQLException {
         List<Grade> grades = GradeService.getInstance().getAll();
         return new ModelAndView("/grade/gradeList.html", "grades", grades);
     }
 
-    private ModelAndView add(HttpServletRequest request, HttpServletResponse response) {
-        return new ModelAndView("/college/addForm.html", "option", 2);
+    private ModelAndView add(HttpServletRequest request, HttpServletResponse response) throws SQLException {
+        List<Period> periods = GradeService.getInstance().getPeriods();
+        List<College> colleges = CollegeService.getInstance().getAll();
+        return new ModelAndView("/grade/addForm.html", Map.of( "option", 2, "periods", periods, "colleges", colleges));
     }
 
     private ModelAndView doAdd(HttpServletRequest request, HttpServletResponse response) throws SQLException {
         HttpSession session = request.getSession();
-        College college = new College();
-        college.parse(request);
-        if (CollegeService.getInstance().add(college)) {
-            session.setAttribute("errors", Map.of("title", "添加学院", "message", "添加成功", "url", "/college?option=0"));
+        Grade grade = new Grade();
+        grade.parse(request);
+        if (GradeService.getInstance().add(grade)) {
+            session.setAttribute("errors", Map.of("title", "添加班级", "message", "添加成功", "url", "/grade?option=0"));
         } else {
-            session.setAttribute("errors", Map.of("title", "添加学院", "message", "添加失败", "url", "/college?option=0"));
+            session.setAttribute("errors", Map.of("title", "添加班级", "message", "添加失败", "url", "/grade?option=0"));
         }
         return new ModelAndView("redirect:/error");
     }
 
     private ModelAndView update(HttpServletRequest request, HttpServletResponse response) throws SQLException {
         int id = Integer.parseInt(request.getParameter("id"));
-        College college = CollegeService.getInstance().getById(id);
-        return new ModelAndView("/college/updateForm.html", Map.of("option", 4, "college", college));
+        Grade grade = GradeService.getInstance().getById(id);
+        List<Period> periods = GradeService.getInstance().getPeriods();
+        List<College> colleges = CollegeService.getInstance().getAll();
+        return new ModelAndView("/grade/updateForm.html", Map.of("option", 4, "grade", grade, "periods", periods, "colleges", colleges));
     }
 
     private ModelAndView doUpdate(HttpServletRequest request, HttpServletResponse response) throws SQLException {
         HttpSession session = request.getSession();
-        College college = new College();
-        college.parse(request);
-        if (CollegeService.getInstance().update(college)) {
-            session.setAttribute("errors", Map.of("title", "添加学院", "message", "添加成功", "url", "/college?option=0"));
+        Grade grade = new Grade();
+        grade.parse(request);
+        if (GradeService.getInstance().update(grade)) {
+            session.setAttribute("errors", Map.of("title", "修改班级", "message", "修改成功", "url", "/grade?option=0"));
         } else {
-            session.setAttribute("errors", Map.of("title", "添加学院", "message", "添加失败", "url", "/college?option=0"));
+            session.setAttribute("errors", Map.of("title", "修改班级", "message", "修改失败", "url", "/grade?option=0"));
         }
         return new ModelAndView("redirect:/error");
+    }
+
+    private ModelAndView detail(HttpServletRequest request, HttpServletResponse response) throws SQLException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        Grade grade = GradeService.getInstance().getDetailById(id);
+        return new ModelAndView("/grade/detail.html", "grade", grade);
     }
 }

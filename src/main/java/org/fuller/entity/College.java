@@ -9,6 +9,7 @@ public class College {
     private int id;
     private String name;
     private String num;
+    private String phone;
 
     public void parse(HttpServletRequest request) {
         String strId = request.getParameter("id");
@@ -17,5 +18,6 @@ public class College {
         }
         name = request.getParameter("name");
         num = request.getParameter("num");
+        phone = request.getParameter("phone");
     }
 }

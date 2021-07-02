@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<title>添加学院</title>
+<title>添加班级</title>
 <link href="/static/css/style.css" rel="stylesheet" type="text/css" />
 </head>
 
@@ -12,20 +12,38 @@
     <span>位置：</span>
     <ul class="placeul">
     <li><a href="#">首页</a></li>
-    <li><a href="/college?option=0">学院</a></li>
-    <li><a href="/college?option=1">添加学院</a></li>
+    <li><a href="/grade?option=0">班级</a></li>
+    <li><a href="/grade?option=1">添加班级</a></li>
     </ul>
     </div>
     
     <div class="formbody">
     
-    <div class="formtitle"><span>添加学院</span></div>
-        <form action="/college">
+    <div class="formtitle"><span>添加班级</span></div>
+        <form action="/grade">
             <input type="hidden" name="option" value="{{ option }}"/>
             <ul class="forminfo">
-                <li><label>学院编号</label><input name="num" type="text" class="dfinput" /><i>2个字符</i></li>
-                <li><label>学院名称</label><input name="name" type="text" class="dfinput" /><i>多个关键字用,隔开</i></li>
-
+                <li><label>班级编号</label><input name="num" type="text" class="dfinput" /><i>多个字符</i></li>
+                <li><label>所属年级</label>
+                    <cite>
+                        <select name="periodId">
+                            <option value="">请选择年级</option>
+                            {% for period in periods %}
+                            <option value="{{ period.id }}">{{ period.period }}</option>
+                            {% endfor %}
+                        </select>
+                    </cite>
+                </li>
+                <li><label>所属学院</label>
+                    <cite>
+                        <select name="collegeId">
+                            <option value="">请选择学院</option>
+                            {% for college in colleges %}
+                            <option value="{{ college.id }}">{{ college.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </cite>
+                </li>
                 <li><label>&nbsp;</label><input type="submit" class="btn" value="确认保存"/></li>
             </ul>
         </form>

@@ -33,6 +33,7 @@ public class CollegeDao {
                     college.setId(set.getInt(1));
                     college.setName(set.getString(2));
                     college.setNum(set.getString(3));
+                    college.setPhone(set.getString(4));
                     colleges.add(college);
                 }
             }
@@ -62,6 +63,7 @@ public class CollegeDao {
                     college.setId(set.getInt(1));
                     college.setName(set.getString(2));
                     college.setNum(set.getString(3));
+                    college.setPhone(set.getString(4));
                 } else {
                     college = null;
                 }
@@ -77,6 +79,7 @@ public class CollegeDao {
                 ps.setString(1, college.getName());
                 ps.setString(2, college.getNum());
                 ps.setInt(3, college.getId());
+                // 懒得添加Phone
                 count = ps.executeUpdate();
             }
         }

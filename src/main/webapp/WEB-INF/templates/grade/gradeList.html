@@ -37,7 +37,7 @@ $(document).ready(function(){
     <span>位置：</span>
     <ul class="placeul">
     <li><a href="#">首页</a></li>
-    <li><a href="/college?option=0">学院</a></li>
+    <li><a href="/grade?option=0">班级</a></li>
     <li><a href="#">列表页</a></li>
     </ul>
     </div>
@@ -48,7 +48,7 @@ $(document).ready(function(){
     
     	<ul class="toolbar">
         <li class="click"><span><img src="/static/images/t01.png" /></span>
-            <a href="/college?option=1" class="tablelink">添加</a>
+            <a href="/grade?option=1" class="tablelink">添加</a>
         </li>
         </ul>
     
@@ -63,6 +63,7 @@ $(document).ready(function(){
         <th>所属年级</th>
         <th>所属学院</th>
         <th>班主任</th>
+        <th>操作</th>
         </tr>
         </thead>
         <tbody>
@@ -70,12 +71,16 @@ $(document).ready(function(){
             <tr>
                 <td>{{ loop.index + 1 }}</td>
                 <td>{{ grade.num }}</td>
-                <td>{{ grade.periodId }}</td>
+                <td>{{ grade.period }}</td>
+                <td>
+                    <a href="/college?option=6&id={{ grade.belongToCollegeId }}" class="tablelink">{{ grade.belongToCollege }}</a>
+                </td>
+                <td>{{ grade.headTeacher }}</td>
 
                 <td>
-                    <a href="/college?option=1&id={{ grade.id }}" class="tablelink">添加</a>
-                    <a href="/college?option=3&id={{ grade.id }}" class="tablelink">修改</a>
-                    <a href="/college?option=5&id={{ grade.id }}" class="tablelink">删除</a></td>
+                    <a href="/grade?option=3&id={{ grade.id }}" class="tablelink">修改</a>
+                    <a href="/grade?option=9&id={{ grade.id }}" class="tablelink">指定班主任</a>
+                    <a href="/grade?option=7&id={{ grade.id }}" class="tablelink">详情</a></td>
             </tr>
         {% endfor %}
         </tbody>

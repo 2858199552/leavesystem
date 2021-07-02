@@ -39,6 +39,10 @@ public class CollegeController {
                     return update(request, response);
                 case OPTION_DO_UPDATE:
                     return doUpdate(request, response);
+                case OPTION_DELETE:
+                    return null;
+                case OPTION_DETAIL:
+                    return detail(request, response);
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -84,5 +88,11 @@ public class CollegeController {
             session.setAttribute("errors", Map.of("title", "添加学院", "message", "添加失败", "url", "/college?option=0"));
         }
         return new ModelAndView("redirect:/error");
+    }
+
+    public ModelAndView detail(HttpServletRequest request, HttpServletResponse response) throws SQLException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        College college = CollegeService.getInstance().getById(id);
+        return new ModelAndView("/college/detail.html", "college", college);
     }
 }
