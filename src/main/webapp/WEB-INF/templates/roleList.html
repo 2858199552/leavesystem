@@ -47,9 +47,11 @@ $(document).ready(function(){
     <div class="tools">
     
     	<ul class="toolbar">
-        <li class="click"><span><img src="/static/images/t01.png" /></span>
-            <a href="/role/add" class="tablelink">添加</a>
-        </li>
+            {% if leaveSession.hasPermission('system.role.add') %}
+            <li class="click"><span><img src="/static/images/t01.png" /></span>
+                <a href="/role/add" class="tablelink">添加</a>
+            </li>
+            {% endif %}
         </ul>
     
     </div>
@@ -74,10 +76,16 @@ $(document).ready(function(){
                 <td>{{ role.getTypeName(roleTypes, role.areaType) }}</td>
 
                 <td>
-                    <a href="/role/query" class="tablelink">查看</a>
+                    {% if leaveSession.hasPermission('system.role.update') %}
                     <a href="/role/update?id={{ role.id }}" class="tablelink">修改</a>
+                    {% endif %}
+                    {% if leaveSession.hasPermission('system.role.menu') %}
                     <a href="/role/authorize?id={{ role.id }}" class="tablelink">授权</a>
-                    <a href="/role/delete?id={{ role.id }}" class="tablelink">删除</a></td>
+                    {% endif %}
+                    {% if leaveSession.hasPermission('system.role.delete') %}
+                    <a href="/role/delete?id={{ role.id }}" class="tablelink">删除</a>
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
         </tbody>

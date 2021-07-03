@@ -25,6 +25,10 @@ $(document).ready(function(){
 });
 
 });
+
+function formSubmit(){
+    document.queryGrade.submit();
+}
 </script>
 
 
@@ -43,15 +47,43 @@ $(document).ready(function(){
     </div>
     
     <div class="rightinfo">
+        <form action="/grade" name="queryGrade">
+            <input type="hidden" name="option" value="0"/>
+            <div class="tools">
+                <ul class="toolbar">
+                    <li><label>所属学院</label>
+                        <cite>
+                            <select name="collegeId">
+                                <option value="0">请选择学院</option>
+                                {% for college in colleges %}
+                                <option value="{{ college.id }}" {{ grade.belongToCollegeId == college.id ? 'selected=selected' : ''}}>{{ college.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </cite>
+                    </li>
+                    <li><label>所属年级</label>
+                        <cite>
+                            <select name="periodId">
+                                <option value="0">请选择年级</option>
+                                {% for period in periods %}
+                                <option value="{{ period.id }}" {{ grade.periodId == period.id ? 'selected=selected' : ''}}>{{ period.period }}</option>
+                                {% endfor %}
+                            </select>
+                        </cite>
+                    </li>
+                    <li><span><img src="static/images/ico06.png" onclick="formSubmit();" /></span></li>
+                </ul>
+            </div>
+        </form>
     
     <div class="tools">
-    
     	<ul class="toolbar">
-        <li class="click"><span><img src="/static/images/t01.png" /></span>
-            <a href="/grade?option=1" class="tablelink">添加</a>
-        </li>
+            {% if leaveSession.hasPermission('baseInfo.grade.add') %}
+            <li class="click"><span><img src="/static/images/t01.png" /></span>
+                <a href="/grade?option=1" class="tablelink">添加</a>
+            </li>
+            {% endif %}
         </ul>
-    
     </div>
     
     
@@ -78,34 +110,20 @@ $(document).ready(function(){
                 <td>{{ grade.headTeacher }}</td>
 
                 <td>
+                    {% if leaveSession.hasPermission('baseInfo.grade.update') %}
                     <a href="/grade?option=3&id={{ grade.id }}" class="tablelink">修改</a>
-                    <a href="/grade?option=9&id={{ grade.id }}" class="tablelink">指定班主任</a>
-                    <a href="/grade?option=7&id={{ grade.id }}" class="tablelink">详情</a></td>
+                    {% endif %}
+                    {% if leaveSession.hasPermission('baseInfo.grade.detail') %}
+                    <a href="/grade?option=7&id={{ grade.id }}" class="tablelink">详情</a>
+                    {% endif %}
+                    {% if leaveSession.hasPermission('baseInfo.headTeacher') %}
+                    <a href="/grade?option=6&id={{ grade.id }}" class="tablelink">指定班主任</a>
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-    
-<!--    <div class="tip">-->
-<!--    	<div class="tiptop"><span>提示信息</span><a></a></div>-->
-
-<!--      <div class="tipinfo">-->
-<!--        <span><img src="/static/images/ticon.png" /></span>-->
-<!--        <div class="tipright">-->
-<!--        <p>是否确认对信息的修改 ？</p>-->
-<!--        <cite>如果是请点击确定按钮 ，否则请点取消。</cite>-->
-<!--        </div>-->
-<!--        </div>-->
-
-<!--        <div class="tipbtn">-->
-<!--        <input name="" type="button"  class="sure" value="确定" />&nbsp;-->
-<!--        <input name="" type="button"  class="cancel" value="取消" />-->
-<!--        </div>-->
-
-<!--    </div>-->
-    
-    
-    
     
     </div>
     

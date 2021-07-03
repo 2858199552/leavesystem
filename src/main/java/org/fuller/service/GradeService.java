@@ -22,8 +22,8 @@ public class GradeService {
         return GradeDao.getInstance().getGradesByUserId(userId);
     }
 
-    public List<Grade> getAll() throws SQLException {
-        return GradeDao.getInstance().getAll();
+    public List<Grade> getAll(Grade grade, String whereClause) throws SQLException {
+        return GradeDao.getInstance().getAll(grade, whereClause);
     }
 
     public boolean add(Grade grade) throws SQLException {
@@ -44,5 +44,9 @@ public class GradeService {
 
     public Grade getDetailById(int id) throws SQLException {
         return GradeDao.getInstance().getDetailById(id);
+    }
+
+    public boolean setHeadTeacher(int gradeId, int teacherId) throws SQLException {
+        return GradeDao.getInstance().setHeadTeacher(gradeId, teacherId);
     }
 }

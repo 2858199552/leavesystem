@@ -11,6 +11,7 @@ import org.fuller.framework.ModelAndView;
 import org.fuller.framework.PostMapping;
 import org.fuller.service.*;
 import org.fuller.session.LeaveSession;
+import org.fuller.unit.MessageUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -115,6 +116,9 @@ public class UserController {
         List<Role> roles = RoleService.getInstance().getRolesByUserId(teacher.getId());
         leaveSession.setRoles(roles);
         for (var role : roles) {
+            if (leaveSession.getDataArea() < role.getAreaType()) {
+                leaveSession.setDataArea(role.getAreaType());
+            }
             if (role.getId() == ROLE_SIGN_HEADTEACHER) {
                 leaveSession.setHeadTeacher(true);
                 List<Grade> grades = GradeService.getInstance().getGradesByUserId(teacher.getId());
@@ -242,8 +246,8 @@ public class UserController {
     }
 
     @GetMapping("/error")
-    public ModelAndView errorPage(HttpSession session) {
-        return new ModelAndView("error.html", (Map<String, Object>) session.getAttribute("errors"));
+    public ModelAndView errorPage(HttpServletRequest request, HttpSession session) {
+        return new ModelAndView("error.html", MessageUnit.showMessage(session));
     }
 
     //endregion

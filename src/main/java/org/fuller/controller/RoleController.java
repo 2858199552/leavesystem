@@ -9,6 +9,7 @@ import org.fuller.framework.PostMapping;
 import org.fuller.service.MenuService;
 import org.fuller.service.RoleService;
 import org.fuller.servlet.InitiateServlet;
+import org.fuller.session.LeaveSession;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 public class RoleController {
     private static final long serialVersionUID = 1;
+
 //    private enum Option {
 //        OPTION_QUERY,
 //        OPTION_ADD,
@@ -75,9 +77,10 @@ public class RoleController {
     // region option method
     @GetMapping("/role/query")
     public ModelAndView query(HttpServletRequest request) throws SQLException {
+        LeaveSession leaveSession = (LeaveSession) request.getSession().getAttribute("leaveSession");
         List<Role> roles = RoleService.getInstance().getAll();
         List<RoleType> roleTypes = (List<RoleType>) request.getServletContext().getAttribute("roleTypes");
-        return new ModelAndView("roleList.html", Map.of("roles", roles, "roleTypes", roleTypes));
+        return new ModelAndView("roleList.html", Map.of("roles", roles, "roleTypes", roleTypes, "leaveSession", leaveSession));
     }
 
     @GetMapping("/role/add")

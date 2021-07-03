@@ -43,10 +43,32 @@ public class GradeDao {
         return grades;
     }
 
-    public List<Grade> getAll() throws SQLException {
+    public List<Grade> getAll(Grade gradeCondition, String whereClause) throws SQLException {
         List<Grade> grades = new ArrayList<>();
+        int belongToCollegeId = gradeCondition.getBelongToCollegeId();
+        int periodId = gradeCondition.getPeriodId();
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT * FROM grade_view ");
+        if (whereClause == null) {
+            if (belongToCollegeId != 0 && periodId != 0) {
+                sql.append("WHERE belongToCollegeId = " + belongToCollegeId + " AND periodId = " + periodId);
+            } else if (belongToCollegeId != 0) {
+                    sql.append("WHERE belongToCollegeId = " + belongToCollegeId);
+                } else if (periodId != 0) {
+                    sql.append("WHERE periodId = " + periodId);
+                }
+        } else {
+            sql.append("WHERE " + whereClause);
+            if (belongToCollegeId != 0) {
+                sql.append(" AND belongToCollegeId = " + belongToCollegeId);
+            }
+            if (periodId != 0) {
+                sql.append(" AND periodId = " + periodId);
+            }
+        }
+        sql.append(" ORDER BY id DESC ");
         try (Connection conn = JdbcUnit.getInstance().getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement("SELECT * FROM grade_view ORDER BY id DESC ")) {
+            try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
                 ResultSet set = ps.executeQuery();
                 while (set.next()) {
                     Grade grade = new Grade();
@@ -152,5 +174,17 @@ public class GradeDao {
             }
         }
         return grade;
+    }
+
+    public boolean setHeadTeacher(int gradeId, int teacherId) throws SQLException {
+        int count = 0;
+        try (Connection conn = JdbcUnit.getInstance().getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement("UPDATE grades SET headTeacherId = ? WHERE id = ?")) {
+                ps.setInt(1, teacherId);
+                ps.setInt(2, gradeId);
+                count = ps.executeUpdate();
+            }
+        }
+        return count == 1;
     }
 }

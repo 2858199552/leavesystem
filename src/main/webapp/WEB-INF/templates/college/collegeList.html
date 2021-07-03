@@ -47,9 +47,11 @@ $(document).ready(function(){
     <div class="tools">
     
     	<ul class="toolbar">
-        <li class="click"><span><img src="/static/images/t01.png" /></span>
-            <a href="/college?option=1" class="tablelink">添加</a>
-        </li>
+            {% if leaveSession.hasPermission('baseInfo.college.add') %}
+            <li class="click"><span><img src="/static/images/t01.png" /></span>
+                <a href="/college?option=1" class="tablelink">添加</a>
+            </li>
+            {% endif %}
         </ul>
     
     </div>
@@ -72,10 +74,13 @@ $(document).ready(function(){
                 <td>{{ college.name }}</td>
 
                 <td>
-                    <a href="/college?option=1&id={{ college.id }}" class="tablelink">添加</a>
+                    {% if leaveSession.hasPermission('baseInfo.college.update') %}
                     <a href="/college?option=3&id={{ college.id }}" class="tablelink">修改</a>
-                    <a href="/college?option=5&id={{ college.id }}" class="tablelink">删除</a>
-                    <a href="/college?option=6&id={{ college.id }}" class="tablelink">详情</a></td>
+                    {% endif %}
+                    {% if leaveSession.hasPermission('baseInfo.college.detail') %}
+                    <a href="/college?option=6&id={{ college.id }}" class="tablelink">详情</a>
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
         </tbody>

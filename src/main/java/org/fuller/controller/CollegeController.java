@@ -4,6 +4,7 @@ import org.fuller.entity.College;
 import org.fuller.framework.GetMapping;
 import org.fuller.framework.ModelAndView;
 import org.fuller.service.CollegeService;
+import org.fuller.session.LeaveSession;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,8 +53,9 @@ public class CollegeController {
 
 
     private ModelAndView query(HttpServletRequest request, HttpServletResponse response) throws SQLException {
+        LeaveSession leaveSession = (LeaveSession) request.getSession().getAttribute("leaveSession");
         List<College> colleges = CollegeService.getInstance().getAll();
-        return new ModelAndView("/college/collegeList.html", "colleges", colleges);
+        return new ModelAndView("/college/collegeList.html", Map.of("colleges", colleges, "leaveSession", leaveSession));
     }
 
     private ModelAndView add(HttpServletRequest request, HttpServletResponse response) {

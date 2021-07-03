@@ -28,7 +28,7 @@ public class DispatcherServlet extends HttpServlet {
     private Map<String, PostDispatcher> postMappings = new HashMap<>();
 
     // 可指定package并自动扫描
-    private List<Class<?>> controllers = List.of(IndexController.class, UserController.class, RoleController.class, CollegeController.class, GradeController.class);
+    private List<Class<?>> controllers = List.of(UserController.class, RoleController.class, CollegeController.class, GradeController.class);
 
     private ViewEngine viewEngine;
 
