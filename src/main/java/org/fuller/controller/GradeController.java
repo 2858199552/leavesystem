@@ -3,6 +3,8 @@ package org.fuller.controller;
 import org.fuller.entity.*;
 import org.fuller.framework.GetMapping;
 import org.fuller.framework.ModelAndView;
+import org.fuller.page.Page;
+import org.fuller.page.PageUtil;
 import org.fuller.service.CollegeService;
 import org.fuller.service.GradeService;
 import org.fuller.service.TeacherService;
@@ -70,10 +72,23 @@ public class GradeController {
         String whereClause = getWhereClause(leaveSession);
         Grade grade = new Grade();
         grade.parse(request);
-        List<Grade> grades = GradeService.getInstance().getAll(grade, whereClause);
+        List<Grade> grades;
         List<Period> periods = GradeService.getInstance().getPeriods();
         List<College> colleges = CollegeService.getInstance().getAll();
-        return new ModelAndView("/grade/gradeList.html", Map.of("grades", grades, "leaveSession", leaveSession, "periods", periods, "colleges", colleges, "grade", grade));
+
+        Page page = (Page) request.getAttribute("page");
+        PageUtil pageUtil = (PageUtil) request.getAttribute("pageUtil");
+// TODO: 2021/7/4 只剩10.8没看
+        if (page != null) {
+            int totalRecords = GradeService.getInstance().getTotalRecord(grade, whereClause, page);
+            page.setPageRecords(totalRecords);
+            grades = GradeService.getInstance().getAll(grade, whereClause, page);
+//            request.setAttribute("forwardUrl", "/grade/gradeList.html");
+            return new ModelAndView("/grade/gradeList.html", Map.of("grades", grades, "leaveSession", leaveSession, "periods", periods, "colleges", colleges, "grade", grade, "page", page, "pageUtil", pageUtil));
+        } else {
+            grades = GradeService.getInstance().getAll(grade, whereClause, null);
+            return new ModelAndView("/grade/gradeList.html", Map.of("grades", grades, "leaveSession", leaveSession, "periods", periods, "colleges", colleges, "grade", grade));
+        }
     }
 
     private String getWhereClause(LeaveSession leaveSession) {

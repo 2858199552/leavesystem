@@ -4,6 +4,7 @@ import org.fuller.entity.College;
 import org.fuller.entity.Grade;
 import org.fuller.entity.Period;
 import org.fuller.entity.Role;
+import org.fuller.page.Page;
 import org.fuller.unit.JdbcUnit;
 
 import java.sql.Connection;
@@ -43,7 +44,7 @@ public class GradeDao {
         return grades;
     }
 
-    public List<Grade> getAll(Grade gradeCondition, String whereClause) throws SQLException {
+    public List<Grade> getAll(Grade gradeCondition, String whereClause, Page page) throws SQLException {
         List<Grade> grades = new ArrayList<>();
         int belongToCollegeId = gradeCondition.getBelongToCollegeId();
         int periodId = gradeCondition.getPeriodId();
@@ -67,6 +68,9 @@ public class GradeDao {
             }
         }
         sql.append(" ORDER BY id DESC ");
+        if (page != null) {
+            sql.append("LIMIT " + (page.getPageNo() - 1) + ", " + Page.PAGE_SIZE);
+        }
         try (Connection conn = JdbcUnit.getInstance().getConnection()) {
             try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
                 ResultSet set = ps.executeQuery();
@@ -186,5 +190,40 @@ public class GradeDao {
             }
         }
         return count == 1;
+    }
+
+    public int getTotalRecord(Grade gradeCondition, String whereClause, Page page) throws SQLException {
+        int totalRecord = 0;
+        int belongToCollegeId = gradeCondition.getBelongToCollegeId();
+        int periodId = gradeCondition.getPeriodId();
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT count(*) FROM grade_view ");
+        if (whereClause == null) {
+            if (belongToCollegeId != 0 && periodId != 0) {
+                sql.append("WHERE belongToCollegeId = " + belongToCollegeId + " AND periodId = " + periodId);
+            } else if (belongToCollegeId != 0) {
+                sql.append("WHERE belongToCollegeId = " + belongToCollegeId);
+            } else if (periodId != 0) {
+                sql.append("WHERE periodId = " + periodId);
+            }
+        } else {
+            sql.append("WHERE " + whereClause);
+            if (belongToCollegeId != 0) {
+                sql.append(" AND belongToCollegeId = " + belongToCollegeId);
+            }
+            if (periodId != 0) {
+                sql.append(" AND periodId = " + periodId);
+            }
+        }
+        sql.append(" ORDER BY id DESC ");
+        try (Connection conn = JdbcUnit.getInstance().getConnection()) {
+            try (PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+                ResultSet set = ps.executeQuery();
+                if (set.next()) {
+                    totalRecord = set.getInt(1);
+                }
+            }
+        }
+        return totalRecord;
     }
 }

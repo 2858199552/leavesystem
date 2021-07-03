@@ -51,7 +51,6 @@ public class CollegeController {
         return new ModelAndView("/college/collegeList.html");
     }
 
-
     private ModelAndView query(HttpServletRequest request, HttpServletResponse response) throws SQLException {
         LeaveSession leaveSession = (LeaveSession) request.getSession().getAttribute("leaveSession");
         List<College> colleges = CollegeService.getInstance().getAll();
