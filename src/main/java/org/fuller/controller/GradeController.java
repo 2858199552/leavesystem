@@ -77,14 +77,14 @@ public class GradeController {
         List<College> colleges = CollegeService.getInstance().getAll();
 
         Page page = (Page) request.getAttribute("page");
-        PageUtil pageUtil = (PageUtil) request.getAttribute("pageUtil");
-// TODO: 2021/7/4 只剩10.8没看
+        // TODO: 2021/7/4 看到11.2
         if (page != null) {
             int totalRecords = GradeService.getInstance().getTotalRecord(grade, whereClause, page);
             page.setPageRecords(totalRecords);
             grades = GradeService.getInstance().getAll(grade, whereClause, page);
-//            request.setAttribute("forwardUrl", "/grade/gradeList.html");
-            return new ModelAndView("/grade/gradeList.html", Map.of("grades", grades, "leaveSession", leaveSession, "periods", periods, "colleges", colleges, "grade", grade, "page", page, "pageUtil", pageUtil));
+            request.setAttribute("grades", grades);
+            request.setAttribute("forwardUrl", "/grade/gradeList.html");
+            return null;
         } else {
             grades = GradeService.getInstance().getAll(grade, whereClause, null);
             return new ModelAndView("/grade/gradeList.html", Map.of("grades", grades, "leaveSession", leaveSession, "periods", periods, "colleges", colleges, "grade", grade));

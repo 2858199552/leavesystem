@@ -11,12 +11,14 @@ public class PageFilter implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         String strPageNo = request.getParameter("pageNo");
-        if (strPageNo != null) {
-            int pageNo = Integer.parseInt(strPageNo);
+        if (strPageNo != null) {            int pageNo = Integer.parseInt(strPageNo);
+
             Page page = new Page();
             page.setPageNo(pageNo);
             request.setAttribute("page", page);
         }
+
+        filterChain.doFilter(servletRequest, servletResponse);
 //        判断request中是否有page属性
         Page page = (Page) request.getAttribute("page");
         if (page != null) {
@@ -30,9 +32,8 @@ public class PageFilter implements Filter {
             pageUtil.init(page, request);
             request.setAttribute("pageUtil", pageUtil);
 //        forward到目标页面
-//            String url = (String) request.getAttribute("forwardUrl");
-//            request.getRequestDispatcher(url).forward(request, servletResponse);
+            String url = (String) request.getAttribute("forwardUrl");
+            request.getRequestDispatcher(url).forward(request, servletResponse);
         }
-        filterChain.doFilter(servletRequest, servletResponse);
     }
 }

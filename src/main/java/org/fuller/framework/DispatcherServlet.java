@@ -2,6 +2,7 @@ package org.fuller.framework;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.fuller.Interceptor.PageInterceptor;
 import org.fuller.controller.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,9 @@ public class DispatcherServlet extends HttpServlet {
 
     // 可指定package并自动扫描
     private List<Class<?>> controllers = List.of(UserController.class, RoleController.class, CollegeController.class, GradeController.class, TeacherController.class);
+
+    // 拦截器列表
+    private List<Class<?>> interceptors = List.of(PageInterceptor.class);
 
     private ViewEngine viewEngine;
 
@@ -142,6 +146,30 @@ public class DispatcherServlet extends HttpServlet {
             HttpServletResponse.class, HttpSession.class);
 
     private static final Set<Class<?>> supportedPostParameterTypes = Set.of(HttpServletRequest.class, HttpServletResponse.class, HttpSession.class);
+
+    // region 自制入口，包括拦截器和执行请求代码
+    private void doDispatch(HttpServletRequest request, HttpServletResponse response, Map<String, ? extends AbstractDispatcher> dispatcherMap) throws Exception {
+        for (var interceptor : interceptors) {
+            HandlerInterceptor realInterceptor = (HandlerInterceptor) interceptor.getConstructor().newInstance();
+            if (!realInterceptor.preHandle(request, response, null)) {
+                realInterceptor.afterCompletion(request, response, null, null);
+                return;
+            }
+        }
+        process(request, response, dispatcherMap);
+    }
+
+    private boolean applyPreHandle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        for (var interceptor : interceptors) {
+            HandlerInterceptor realInterceptor = (HandlerInterceptor) interceptor.getConstructor().newInstance();
+            if (!realInterceptor.preHandle(request, response, null)) {
+                realInterceptor.afterCompletion(request, response, null, null);
+                return false;
+            }
+        }
+        return true;
+    }
+    // endregion
 }
 
 abstract class AbstractDispatcher {
